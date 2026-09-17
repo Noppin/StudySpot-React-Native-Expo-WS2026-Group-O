@@ -3,9 +3,9 @@
 Welcome to the team project repository for the Cross-Platform Development course.
 
 ## Team Details
-* **Student 1**: [Full Name] ([GitHub Handle])
-* **Student 2**: [Full Name] ([GitHub Handle])
-* **App Name**: [Your App Concept Name]
+* **Student 1**: Nippon Lama (Noppin)
+* **Student 2**: [Full Name] (Mark-Stessl)
+* **App Name**: StudySpot
 
 ---
 
