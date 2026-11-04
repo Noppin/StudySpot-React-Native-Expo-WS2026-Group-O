@@ -1,6 +1,8 @@
 node_modules/
 .expo/
 dist/
+web-build/
+coverage/
 npm-debug.*
 *.jks
 *.p8
@@ -8,5 +10,9 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
-web-build/
-.env*
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
