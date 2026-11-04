@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "StudySpot",
+    "slug": "studyspot",
+    "version": "1.0.0",
+    "scheme": "studyspot",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "android": {
+      "package": "at.fhtw.studyspot"
+    },
+    "ios": {
+      "bundleIdentifier": "at.fhtw.studyspot",
+      "supportsTablet": true
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "StudySpot uses your location to sort study places by distance."
+        }
+      ]
+    ]
+  }
+}
