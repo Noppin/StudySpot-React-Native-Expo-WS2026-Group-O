@@ -1,63 +1,167 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
+import { InfoBanner } from '../components/InfoBanner';
 import { LocationCard } from '../components/LocationCard';
-import { getMockStudyLocations } from '../services/mockLocationService';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { theme } from '../constants/theme';
+import { useStudySpot } from '../hooks/useStudySpot';
 import type { StudyLocation } from '../types/StudyLocation';
-import React from 'react';
 
 interface HomeScreenProps {
   onSelectLocation: (location: StudyLocation) => void;
 }
 
-const locations = getMockStudyLocations();
+export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
+  const [search, setSearch] = useState('');
+  const {
+    locations,
+    isLoading,
+    error,
+    dataSource,
+    refresh,
+    isFavorite,
+    toggleFavorite,
+  } = useStudySpot();
 
-export function HomeScreen({
-  onSelectLocation,
-}: HomeScreenProps) {
+  const filteredLocations = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return locations;
+
+    return locations.filter((location) =>
+      [location.name, location.category, location.address ?? '']
+        .join(' ')
+        .toLowerCase()
+        .includes(term),
+    );
+  }, [locations, search]);
+
+  const sourceLabel = {
+    live: 'Live OpenStreetMap results',
+    cache: 'Showing saved offline results',
+    sample: 'Showing sample campus locations',
+  }[dataSource];
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>StudySpot</Text>
-      <Text style={styles.subtitle}>
-        Find a suitable study location nearby.
-      </Text>
+    <ScreenContainer padded={false}>
+      <View style={styles.header}>
+        <Text style={styles.eyebrow}>FIND YOUR NEXT STUDY PLACE</Text>
+        <Text style={styles.title}>StudySpot</Text>
+        <Text style={styles.subtitle}>
+          Libraries, cafés and quiet places around campus.
+        </Text>
+        <TextInput
+          accessibilityLabel="Search study places"
+          placeholder="Search name, category or address"
+          placeholderTextColor={theme.colors.muted}
+          value={search}
+          onChangeText={setSearch}
+          style={styles.search}
+          returnKeyType="search"
+        />
+        <View style={styles.sourceRow}>
+          <View style={[styles.sourceDot, dataSource === 'live' && styles.liveDot]} />
+          <Text style={styles.sourceText}>{sourceLabel}</Text>
+          {isLoading ? <ActivityIndicator size="small" color={theme.colors.primary} /> : null}
+        </View>
+      </View>
 
       <FlatList
-        data={locations}
+        data={filteredLocations}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} />
+        }
+        ListHeaderComponent={
+          error ? <InfoBanner message={`${error} ${sourceLabel}.`} tone="error" /> : null
+        }
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>No places found</Text>
+            <Text style={styles.emptyText}>Try another search or refresh the list.</Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <LocationCard
             location={item}
             onPress={onSelectLocation}
+            isFavorite={isFavorite(item.id)}
+            onToggleFavorite={toggleFavorite}
           />
         )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-    </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#f7f7f7',
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
+  header: {
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.screen,
+    paddingTop: 22,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  eyebrow: {
+    color: theme.colors.primary,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.3,
   },
   title: {
-    fontSize: 30,
-    fontWeight: '700',
+    color: theme.colors.text,
+    fontSize: 32,
+    fontWeight: '800',
+    marginTop: 5,
   },
   subtitle: {
-    color: '#6b7280',
-    fontSize: 16,
-    marginTop: 6,
+    color: theme.colors.muted,
+    fontSize: 14,
+    marginTop: 4,
   },
+  search: {
+    backgroundColor: theme.colors.background,
+    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderRadius: theme.radius.control,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    marginTop: 18,
+    color: theme.colors.text,
+  },
+  sourceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+  },
+  sourceDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#C18A35',
+  },
+  liveDot: { backgroundColor: '#2D9660' },
+  sourceText: { color: theme.colors.muted, fontSize: 11, flex: 1 },
   list: {
-    paddingBottom: 24,
-    paddingTop: 20,
+    paddingHorizontal: theme.spacing.screen,
+    paddingTop: 14,
+    paddingBottom: 28,
+    flexGrow: 1,
   },
-  separator: {
-    height: 12,
-  },
+  separator: { height: 10 },
+  empty: { padding: 24, alignItems: 'center' },
+  emptyTitle: { color: theme.colors.text, fontWeight: '700', fontSize: 17 },
+  emptyText: { color: theme.colors.muted, marginTop: 5, textAlign: 'center' },
 });
