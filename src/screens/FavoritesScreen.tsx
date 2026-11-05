@@ -1,9 +1,61 @@
-import { View, Text } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-export function FavoritesScreen() {
+import { LocationCard } from '../components/LocationCard';
+import { ScreenContainer } from '../components/ScreenContainer';
+import { theme } from '../constants/theme';
+import { useStudySpot } from '../hooks/useStudySpot';
+import type { StudyLocation } from '../types/StudyLocation';
+
+interface FavoritesScreenProps {
+  onSelectLocation: (location: StudyLocation) => void;
+}
+
+export function FavoritesScreen({ onSelectLocation }: FavoritesScreenProps) {
+  const { favorites, isFavorite, toggleFavorite } = useStudySpot();
+
   return (
-    <View>
-      <Text>Favorites Screen</Text>
-    </View>
+    <ScreenContainer>
+      <Text style={styles.eyebrow}>YOUR SHORTLIST</Text>
+      <Text style={styles.title}>Saved places</Text>
+      <Text style={styles.subtitle}>
+        Your saved study spots stay on this device, even when you are offline.
+      </Text>
+
+      <FlatList
+        data={favorites}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        renderItem={({ item }) => (
+          <LocationCard
+            location={item}
+            onPress={onSelectLocation}
+            isFavorite={isFavorite(item.id)}
+            onToggleFavorite={toggleFavorite}
+          />
+        )}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyIcon}>♡</Text>
+            <Text style={styles.emptyTitle}>Nothing saved yet</Text>
+            <Text style={styles.emptyText}>
+              Tap the heart on a place in Explore or Nearby to save it here.
+            </Text>
+          </View>
+        }
+      />
+    </ScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  eyebrow: { color: theme.colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  title: { color: theme.colors.text, fontSize: 27, fontWeight: '800', marginTop: 5 },
+  subtitle: { color: theme.colors.muted, fontSize: 13, lineHeight: 19, marginTop: 6 },
+  list: { paddingTop: 18, paddingBottom: 24, flexGrow: 1 },
+  separator: { height: 10 },
+  empty: { alignItems: 'center', paddingHorizontal: 22, paddingVertical: 48 },
+  emptyIcon: { color: theme.colors.primary, fontSize: 42 },
+  emptyTitle: { color: theme.colors.text, fontSize: 17, fontWeight: '700', marginTop: 12 },
+  emptyText: { color: theme.colors.muted, textAlign: 'center', lineHeight: 19, marginTop: 6 },
+});
