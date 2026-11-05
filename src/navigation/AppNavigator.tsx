@@ -1,4 +1,3 @@
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -36,11 +35,9 @@ function HomeRoute({ navigation }: any) {
 
 export function AppNavigator() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name='Home' component={MainTabs} />
-        <Stack.Screen name='Details' component={LocationDetailsScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name='Home' component={MainTabs} />
+      <Stack.Screen name='Details' component={LocationDetailsScreen} />
+    </Stack.Navigator>
   );
 }
