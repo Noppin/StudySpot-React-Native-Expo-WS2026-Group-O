@@ -1,8 +1,15 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
 import type { StudyLocation } from '../types/StudyLocation';
 
+export type MainTabParamList = {
+  Explore: undefined;
+  Nearby: undefined;
+  Saved: undefined;
+  Settings: undefined;
+};
+
 export type RootStackParamList = {
-  Home: undefined;
-  Details: {
-    location: StudyLocation;
-  };
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
+  Details: { location: StudyLocation };
 };
