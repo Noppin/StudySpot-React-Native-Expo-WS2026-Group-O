@@ -9,12 +9,15 @@ interface LocationCardProps {
   location: StudyLocation;
   onPress: (location: StudyLocation) => void;
   showFavoriteToggle?: boolean;
+  /** Replaces the heart with a text action, e.g. "Remove" on the Favorites screen. */
+  action?: { label: string; onPress: (location: StudyLocation) => void };
 }
 
 export function LocationCard({
   location,
   onPress,
   showFavoriteToggle = true,
+  action,
 }: LocationCardProps) {
   const isFavorite = useIsFavorite(location.id);
   const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
@@ -40,7 +43,16 @@ export function LocationCard({
         ) : null}
       </Pressable>
 
-      {showFavoriteToggle ? (
+      {action ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${action.label} ${location.name}`}
+          onPress={() => action.onPress(location)}
+          hitSlop={10}
+        >
+          <Text style={styles.action}>{action.label}</Text>
+        </Pressable>
+      ) : showFavoriteToggle ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={
@@ -76,4 +88,5 @@ const styles = StyleSheet.create({
   favorite: { width: 36, alignItems: 'flex-end' },
   favoriteIcon: { fontSize: 20, color: theme.colors.subtle },
   favoriteActive: { color: theme.colors.text },
+  action: { ...theme.type.label, color: theme.colors.muted },
 });
