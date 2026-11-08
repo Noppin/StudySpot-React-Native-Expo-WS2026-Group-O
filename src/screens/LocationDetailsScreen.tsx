@@ -26,7 +26,7 @@ export function LocationDetailsScreen({ route }: Props) {
         <Text style={styles.category}>{location.category.toUpperCase()}</Text>
         <Text style={styles.title}>{location.name}</Text>
         <Text style={styles.intro}>
-          Study place details collected from {location.source === 'sample' ? 'local sample data' : 'OpenStreetMap'}.
+          Study place details collected from OpenStreetMap.
         </Text>
 
         <View style={styles.card}>

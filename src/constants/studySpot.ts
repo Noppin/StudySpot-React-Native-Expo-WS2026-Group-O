@@ -7,8 +7,14 @@ export const DEFAULT_LOCATION: Coordinates = {
   longitude: 16.3776,
 };
 
-export const OVERPASS_API_URL = 'https://overpass-api.de/api/interpreter';
-export const API_TIMEOUT_MS = 25_000;
+/** Geoapify Places API (OpenStreetMap data). https://apidocs.geoapify.com/docs/places/ */
+export const GEOAPIFY_PLACES_URL = 'https://api.geoapify.com/v2/places';
+/**
+ * Read from `.env` at build time (see `.env.example`). EXPO_PUBLIC_ values are
+ * bundled into the app, so restrict the key in the Geoapify dashboard.
+ */
+export const GEOAPIFY_API_KEY = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY ?? '';
+export const API_TIMEOUT_MS = 15_000;
 
 export const SEARCH_RADIUS_OPTIONS = [1000, 2000, 5000, 10000] as const;
 

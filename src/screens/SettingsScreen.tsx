@@ -3,16 +3,13 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { InfoBanner } from '../components/InfoBanner';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
-import { useStudySpot } from '../hooks/useStudySpot';
+import { useClearLocationCache, useLocations } from '../hooks/useLocations';
 
 export function SettingsScreen() {
-  const { dataSource, lastUpdated, refresh, clearCache, isLoading } = useStudySpot();
+  const { isShowingCache, updatedAt, refresh, isRefreshing: isLoading } = useLocations();
+  const clearCache = useClearLocationCache();
 
-  const sourceLabel = {
-    live: 'Live OpenStreetMap data',
-    cache: 'Cached offline data',
-    sample: 'Built-in sample data',
-  }[dataSource];
+  const sourceLabel = isShowingCache ? 'Cached offline data' : 'Live OpenStreetMap data';
 
   function confirmClearCache() {
     Alert.alert(
@@ -35,7 +32,7 @@ export function SettingsScreen() {
         <Text style={styles.label}>CURRENT DATA SOURCE</Text>
         <Text style={styles.value}>{sourceLabel}</Text>
         <Text style={styles.meta}>
-          {lastUpdated ? `Last updated ${lastUpdated.toLocaleString()}` : 'No successful live refresh this session.'}
+          {updatedAt ? `Last updated ${new Date(updatedAt).toLocaleString()}` : 'No data loaded yet.'}
         </Text>
       </View>
 

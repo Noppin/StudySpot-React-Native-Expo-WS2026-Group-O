@@ -13,7 +13,7 @@ import { InfoBanner } from '../components/InfoBanner';
 import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
-import { useStudySpot } from '../hooks/useStudySpot';
+import { useLocations } from '../hooks/useLocations';
 import type { StudyLocation } from '../types/Location';
 
 interface HomeScreenProps {
@@ -24,11 +24,11 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
   const [search, setSearch] = useState('');
   const {
     locations,
-    isLoading,
+    isRefreshing,
     error,
-    dataSource,
+    isShowingCache,
     refresh,
-  } = useStudySpot();
+  } = useLocations();
 
   const filteredLocations = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -42,11 +42,7 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
     );
   }, [locations, search]);
 
-  const sourceLabel = {
-    live: 'Live OpenStreetMap results',
-    cache: 'Showing saved offline results',
-    sample: 'Showing sample campus locations',
-  }[dataSource];
+  const sourceLabel = isShowingCache ? 'Showing saved offline results' : 'Live OpenStreetMap results';
 
   return (
     <ScreenContainer padded={false}>
@@ -66,9 +62,9 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
           returnKeyType="search"
         />
         <View style={styles.sourceRow}>
-          <View style={[styles.sourceDot, dataSource === 'live' && styles.liveDot]} />
+          <View style={[styles.sourceDot, !isShowingCache && styles.liveDot]} />
           <Text style={styles.sourceText}>{sourceLabel}</Text>
-          {isLoading ? <ActivityIndicator size="small" color={theme.colors.accent} /> : null}
+          {isRefreshing ? <ActivityIndicator size="small" color={theme.colors.accent} /> : null}
         </View>
       </View>
 
@@ -78,10 +74,10 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
         contentContainerStyle={styles.list}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} />
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => void refresh()} />
         }
         ListHeaderComponent={
-          error ? <InfoBanner message={`${error} ${sourceLabel}.`} tone="error" /> : undefined
+          error ? <InfoBanner message={error} tone="error" /> : undefined
         }
         ListEmptyComponent={
           <View style={styles.empty}>

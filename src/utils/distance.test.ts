@@ -20,8 +20,8 @@ test('distanceInMeters calculates a known one-degree equatorial distance', () =>
 
 test('sortLocationsByDistance returns nearest places first without mutating input', () => {
   const places: StudyLocation[] = [
-    { id: 'far', name: 'Far', category: 'Library', latitude: 1, longitude: 1 },
-    { id: 'near', name: 'Near', category: 'Cafe', latitude: 0.001, longitude: 0.001 },
+    { id: 'far', name: 'Far', category: 'Library', amenity: 'library', osmType: 'node', osmId: 1, latitude: 1, longitude: 1 },
+    { id: 'near', name: 'Near', category: 'Cafe', amenity: 'cafe', osmType: 'node', osmId: 2, latitude: 0.001, longitude: 0.001 },
   ];
 
   const sorted = sortLocationsByDistance(places, { latitude: 0, longitude: 0 });

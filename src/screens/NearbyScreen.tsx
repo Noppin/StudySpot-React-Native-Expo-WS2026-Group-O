@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,10 +10,8 @@ import {
 import { InfoBanner } from '../components/InfoBanner';
 import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { DEFAULT_LOCATION } from '../constants/studySpot';
 import { theme } from '../constants/theme';
-import { useStudySpot } from '../hooks/useStudySpot';
-import { sortLocationsByDistance } from '../utils/distance';
+import { useLocations } from '../hooks/useLocations';
 import type { StudyLocation } from '../types/Location';
 
 interface NearbyScreenProps {
@@ -25,47 +22,34 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
   const {
     locations,
     currentLocation,
-    locationError,
-    requestCurrentLocation,
-    refresh,
-  } = useStudySpot();
+  } = useLocations();
+  const locationError = currentLocation.message;
 
-  const sortedLocations = useMemo(
-    () => sortLocationsByDistance(locations, currentLocation ?? DEFAULT_LOCATION),
-    [locations, currentLocation],
-  );
-
-  async function locateAndRefresh() {
-    const coordinates = await requestCurrentLocation();
-    if (coordinates) {
-      await refresh(coordinates);
-    }
-  }
 
   return (
     <ScreenContainer>
       <Text style={styles.eyebrow}>AROUND YOU</Text>
       <Text style={styles.title}>Nearby places</Text>
       <Text style={styles.subtitle}>
-        {currentLocation
+        {currentLocation.coordinates
           ? 'Sorted by your current device location.'
           : 'Showing distances from the FHTW campus until you share your location.'}
       </Text>
 
       <Pressable
         accessibilityRole="button"
-        onPress={() => void locateAndRefresh()}
+        onPress={currentLocation.request}
         style={({ pressed }) => [styles.locationButton, pressed && styles.pressed]}
       >
         <Text style={styles.locationButtonText}>
-          {currentLocation ? 'Update my location' : 'Use my location'}
+          {currentLocation.coordinates ? 'Update my location' : 'Use my location'}
         </Text>
       </Pressable>
 
       {locationError ? <InfoBanner message={locationError} tone="error" /> : null}
 
       <FlatList
-        data={sortedLocations}
+        data={locations}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
