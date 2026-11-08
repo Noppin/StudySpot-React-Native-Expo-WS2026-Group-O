@@ -14,13 +14,10 @@ import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
 import { useLocations } from '../hooks/useLocations';
-import type { StudyLocation } from '../types/Location';
+import { useOpenLocationDetails } from '../navigation/useOpenLocationDetails';
 
-interface HomeScreenProps {
-  onSelectLocation: (location: StudyLocation) => void;
-}
-
-export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
+export function HomeScreen() {
+  const onSelectLocation = useOpenLocationDetails();
   const [search, setSearch] = useState('');
   const {
     locations,

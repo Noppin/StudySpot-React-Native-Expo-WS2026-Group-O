@@ -4,13 +4,10 @@ import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
 import { useFavoritesStore } from '../store/favoritesStore';
-import type { StudyLocation } from '../types/Location';
+import { useOpenLocationDetails } from '../navigation/useOpenLocationDetails';
 
-interface FavoritesScreenProps {
-  onSelectLocation: (location: StudyLocation) => void;
-}
-
-export function FavoritesScreen({ onSelectLocation }: FavoritesScreenProps) {
+export function FavoritesScreen() {
+  const onSelectLocation = useOpenLocationDetails();
   const favorites = useFavoritesStore((state) => state.favorites);
 
   return (

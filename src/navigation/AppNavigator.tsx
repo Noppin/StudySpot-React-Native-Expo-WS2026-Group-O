@@ -1,87 +1,62 @@
-import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { ComponentProps } from 'react';
+import { StyleSheet } from 'react-native';
 
-import { FavoritesScreen } from '../screens/FavoritesScreen';
-import { HomeScreen } from '../screens/HomeScreen';
-import { LocationDetailsScreen } from '../screens/LocationDetailsScreen';
-import { NearbyScreen } from '../screens/NearbyScreen';
+import { theme } from '../constants/theme';
 import { SettingsScreen } from '../screens/SettingsScreen';
-import type { StudyLocation } from '../types/Location';
-import type { MainTabParamList, RootStackParamList } from './navigationTypes';
+import {
+  FavoritesStackNavigator,
+  HomeStackNavigator,
+  MapStackNavigator,
+} from './HomeStackNavigator';
+import type { MainTabParamList } from './navigationTypes';
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
 const Tabs = createBottomTabNavigator<MainTabParamList>();
 
-function ExploreRoute() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+const icons: Record<keyof MainTabParamList, [IconName, IconName]> = {
+  HomeTab: ['list-outline', 'list'],
+  MapTab: ['map-outline', 'map'],
+  FavoritesTab: ['heart-outline', 'heart'],
+  Settings: ['options-outline', 'options'],
+};
 
-  return (
-    <HomeScreen
-      onSelectLocation={(location: StudyLocation) =>
-        navigation.navigate('Details', { location })
-      }
-    />
-  );
-}
-
-function NearbyRoute() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
-  return (
-    <NearbyScreen
-      onSelectLocation={(location: StudyLocation) =>
-        navigation.navigate('Details', { location })
-      }
-    />
-  );
-}
-
-function SavedRoute() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
-  return (
-    <FavoritesScreen
-      onSelectLocation={(location: StudyLocation) =>
-        navigation.navigate('Details', { location })
-      }
-    />
-  );
-}
-
-function MainTabs() {
+/** Bottom tabs: Home, Map, Favorites, Settings. */
+export function AppNavigator() {
   return (
     <Tabs.Navigator
-      initialRouteName="Explore"
-      screenOptions={{
+      initialRouteName="HomeTab"
+      screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: '#245C46',
-        tabBarInactiveTintColor: '#7B887F',
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
-      }}
+        tabBarActiveTintColor: theme.colors.text,
+        tabBarInactiveTintColor: theme.colors.subtle,
+        tabBarLabelStyle: styles.label,
+        tabBarStyle: styles.bar,
+        tabBarIcon: ({ focused, color, size }) => (
+          <Ionicons name={icons[route.name][focused ? 1 : 0]} color={color} size={size - 2} />
+        ),
+      })}
     >
-      <Tabs.Screen name="Explore" component={ExploreRoute} />
-      <Tabs.Screen name="Nearby" component={NearbyRoute} />
-      <Tabs.Screen name="Saved" component={SavedRoute} />
+      <Tabs.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: 'Home' }} />
+      <Tabs.Screen name="MapTab" component={MapStackNavigator} options={{ title: 'Map' }} />
+      <Tabs.Screen
+        name="FavoritesTab"
+        component={FavoritesStackNavigator}
+        options={{ title: 'Favorites' }}
+      />
       <Tabs.Screen name="Settings" component={SettingsScreen} />
     </Tabs.Navigator>
   );
 }
 
-export function AppNavigator() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="MainTabs"
-        component={MainTabs}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Details"
-        component={LocationDetailsScreen}
-        options={{ title: 'Place details', headerBackTitle: 'Back' }}
-      />
-    </Stack.Navigator>
-  );
-}
+const styles = StyleSheet.create({
+  bar: {
+    backgroundColor: theme.colors.background,
+    borderTopColor: theme.colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    elevation: 0,
+  },
+  label: { fontSize: 11, fontWeight: '500' },
+});

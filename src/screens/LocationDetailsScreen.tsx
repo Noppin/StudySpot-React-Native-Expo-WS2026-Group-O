@@ -3,9 +3,9 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
-import type { RootStackParamList } from '../navigation/navigationTypes';
+import type { HomeStackParamList } from '../navigation/navigationTypes';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Details'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'LocationDetails'>;
 
 export function LocationDetailsScreen({ route }: Props) {
   const { location } = route.params;
@@ -21,7 +21,7 @@ export function LocationDetailsScreen({ route }: Props) {
   }
 
   return (
-    <ScreenContainer padded={false}>
+    <ScreenContainer padded={false} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.category}>{location.category.toUpperCase()}</Text>
         <Text style={styles.title}>{location.name}</Text>
