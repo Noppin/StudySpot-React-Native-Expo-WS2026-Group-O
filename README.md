@@ -80,6 +80,13 @@ src/
 └── utils/          Distance calculations and unit tests
 ```
 
+## Runtime error recovery
+
+The root `AppErrorBoundary` catches unexpected React rendering errors and shows a
+small recovery screen instead of leaving the user with a blank application. The
+user can retry rendering the current screen. Error details are written to the
+development/runtime console; they are not displayed to end users.
+
 ## Testing
 
 ```bash
