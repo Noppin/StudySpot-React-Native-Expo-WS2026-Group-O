@@ -1,94 +1,149 @@
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
+import { useCurrentLocation } from '../hooks/useCurrentLocation';
 import type { HomeStackParamList } from '../navigation/navigationTypes';
+import { useFavoritesStore, useIsFavorite } from '../store/favoritesStore';
+import { distanceInMeters, formatDistance } from '../utils/distance';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'LocationDetails'>;
 
+function toUrl(website: string): string {
+  return /^https?:\/\//i.test(website) ? website : `https://${website}`;
+}
+
 export function LocationDetailsScreen({ route }: Props) {
   const { location } = route.params;
+  const { origin, coordinates } = useCurrentLocation();
+  const isFavorite = useIsFavorite(location.id);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+
+  // Recalculate so the value is also correct for favourites opened later.
+  const distance = formatDistance(distanceInMeters(origin, location));
+  const distanceLabel = `${distance} ${coordinates ? 'from you' : 'from the default location'}`;
 
   async function openWebsite() {
     if (!location.website) return;
-    const url = location.website.startsWith('http')
-      ? location.website
-      : `https://${location.website}`;
-    if (await Linking.canOpenURL(url)) {
-      await Linking.openURL(url);
-    }
+    const url = toUrl(location.website);
+    if (await Linking.canOpenURL(url)) await Linking.openURL(url);
   }
 
   return (
-    <ScreenContainer padded={false} edges={['left', 'right']}>
+    <ScreenContainer padded={false} edges={['left', 'right', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.category}>{location.category.toUpperCase()}</Text>
-        <Text style={styles.title}>{location.name}</Text>
-        <Text style={styles.intro}>
-          Study place details collected from OpenStreetMap.
+        <Text style={styles.category}>{location.category}</Text>
+        <Text accessibilityRole="header" style={styles.title}>
+          {location.name}
         </Text>
+        <Text style={styles.distance}>{distanceLabel}</Text>
 
-        <View style={styles.card}>
-          <DetailRow label="Address" value={location.address ?? 'Address not available'} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected: isFavorite }}
+          onPress={() => toggleFavorite(location)}
+          style={({ pressed }) => [
+            styles.favoriteButton,
+            isFavorite && styles.favoriteButtonActive,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Ionicons
+            name={isFavorite ? 'heart' : 'heart-outline'}
+            size={18}
+            color={isFavorite ? theme.colors.background : theme.colors.text}
+          />
+          <Text style={[styles.favoriteText, isFavorite && styles.favoriteTextActive]}>
+            {isFavorite ? 'Saved to favorites' : 'Add to favorites'}
+          </Text>
+        </Pressable>
+
+        <View style={styles.section}>
+          <DetailRow label="Address" value={location.address ?? 'Not available'} />
+          <DetailRow label="Category" value={`${location.category} (amenity=${location.amenity})`} />
+          <DetailRow label="Distance" value={distance ?? 'Unknown'} />
+          <DetailRow
+            label="Coordinates"
+            value={`${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`}
+          />
           <DetailRow label="Opening hours" value={location.openingHours ?? 'Not provided'} />
-          <DetailRow label="Coordinates" value={`${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`} />
-          {location.distanceMeters !== undefined ? (
-            <DetailRow label="Distance" value={`${Math.round(location.distanceMeters)} metres`} />
-          ) : null}
+          <DetailRow
+            label="Website"
+            value={location.website ?? 'Not provided'}
+            onPress={location.website ? () => void openWebsite() : undefined}
+          />
+          <DetailRow label="OpenStreetMap ID" value={`${location.osmType}/${location.osmId}`} last />
         </View>
 
-        {location.website ? (
-          <Pressable
-            accessibilityRole="link"
-            onPress={() => void openWebsite()}
-            style={({ pressed }) => [styles.websiteButton, pressed && styles.pressed]}
-          >
-            <Text style={styles.websiteText}>Open website ↗</Text>
-          </Pressable>
-        ) : null}
-
         <Text style={styles.attribution}>
-          Map data © OpenStreetMap contributors. Place details may be incomplete or outdated.
+          Data © OpenStreetMap contributors. Details may be incomplete or outdated.
         </Text>
       </ScrollView>
     </ScreenContainer>
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
+interface DetailRowProps {
+  label: string;
+  value: string;
+  onPress?: () => void;
+  last?: boolean;
+}
+
+function DetailRow({ label, value, onPress, last }: DetailRowProps) {
+  const content = (
+    <>
       <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
-    </View>
+      <Text style={[styles.value, onPress && styles.link]} selectable={!onPress}>
+        {value}
+      </Text>
+    </>
+  );
+
+  return onPress ? (
+    <Pressable
+      accessibilityRole="link"
+      onPress={onPress}
+      style={({ pressed }) => [styles.row, last && styles.rowLast, pressed && styles.pressed]}
+    >
+      {content}
+    </Pressable>
+  ) : (
+    <View style={[styles.row, last && styles.rowLast]}>{content}</View>
   );
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 20, paddingBottom: 36 },
-  category: { color: theme.colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
-  title: { color: theme.colors.text, fontSize: 29, fontWeight: '800', marginTop: 7 },
-  intro: { color: theme.colors.muted, fontSize: 13, lineHeight: 19, marginTop: 7 },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderWidth: 1,
-    borderRadius: theme.radius.md,
-    paddingHorizontal: 16,
-    marginTop: 22,
-  },
-  row: { paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
-  label: { color: theme.colors.muted, fontSize: 11, fontWeight: '700', marginBottom: 5 },
-  value: { color: theme.colors.text, fontSize: 14, lineHeight: 20 },
-  websiteButton: {
-    backgroundColor: theme.colors.accent,
-    borderRadius: theme.radius.md,
-    padding: 14,
+  content: { paddingHorizontal: theme.spacing.screen, paddingBottom: theme.spacing.xl },
+  category: { ...theme.type.label, color: theme.colors.accent },
+  title: { ...theme.type.title, color: theme.colors.text, marginTop: theme.spacing.xs },
+  distance: { ...theme.type.caption, color: theme.colors.muted, marginTop: theme.spacing.xs },
+  favoriteButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.xl,
+    paddingVertical: 12,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
-  websiteText: { color: '#FFFFFF', fontWeight: '700' },
-  pressed: { opacity: 0.75 },
-  attribution: { color: theme.colors.muted, fontSize: 10, lineHeight: 15, marginTop: 20 },
+  favoriteButtonActive: { backgroundColor: theme.colors.text, borderColor: theme.colors.text },
+  favoriteText: { ...theme.type.label, fontSize: 14, color: theme.colors.text },
+  favoriteTextActive: { color: theme.colors.background },
+  section: { marginTop: theme.spacing.xl },
+  row: {
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  rowLast: { borderBottomWidth: 0 },
+  label: { ...theme.type.label, color: theme.colors.subtle, marginBottom: 3 },
+  value: { ...theme.type.body, color: theme.colors.text },
+  link: { color: theme.colors.accent },
+  pressed: { opacity: 0.6 },
+  attribution: { ...theme.type.caption, fontSize: 11, color: theme.colors.subtle, marginTop: theme.spacing.lg },
 });
