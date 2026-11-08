@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/utils/distance.test.ts src/services/apiService.test.ts"
+    "test": "tsx --test src/utils/distance.test.ts src/utils/filters.test.ts src/services/apiService.test.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
