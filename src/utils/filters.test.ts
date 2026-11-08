@@ -1,6 +1,3 @@
-import assert from 'node:assert/strict';
-import test from 'node:test';
-
 import type { StudyLocation, StudyLocationCategory } from '../types/Location';
 import { EMPTY_FILTER, filterLocations, isFilterActive } from './filters';
 
@@ -23,27 +20,32 @@ const places = [
   place('TU Wien', 'University'),
 ];
 
-const names = (result: StudyLocation[]) => result.map((item) => item.name);
+describe('filterLocations', () => {
+  it('returns everything for the empty filter', () => {
+    expect(filterLocations(places, EMPTY_FILTER)).toHaveLength(3);
+  });
 
-test('returns everything for the empty filter', () => {
-  assert.equal(filterLocations(places, EMPTY_FILTER).length, 3);
+  it('searches by name, ignoring case and accents', () => {
+    const result = filterLocations(places, { query: 'cafe', category: 'All' });
+    expect(result.map((item) => item.name)).toEqual(['Café Central']);
+  });
+
+  it('filters by category', () => {
+    const result = filterLocations(places, { query: '', category: 'Library' });
+    expect(result.map((item) => item.name)).toEqual(['Hauptbücherei Wien']);
+  });
+
+  it('combines search and category', () => {
+    expect(filterLocations(places, { query: 'wien', category: 'University' })).toHaveLength(1);
+    expect(filterLocations(places, { query: 'central', category: 'Library' })).toHaveLength(0);
+  });
 });
 
-test('searches by name, ignoring case and accents', () => {
-  assert.deepEqual(names(filterLocations(places, { query: 'cafe', category: 'All' })), ['Café Central']);
-});
-
-test('filters by category and combines it with the search', () => {
-  assert.deepEqual(names(filterLocations(places, { query: '', category: 'Library' })), [
-    'Hauptbücherei Wien',
-  ]);
-  assert.equal(filterLocations(places, { query: 'wien', category: 'University' }).length, 1);
-  assert.equal(filterLocations(places, { query: 'central', category: 'Library' }).length, 0);
-});
-
-test('reports whether a filter is active', () => {
-  assert.equal(isFilterActive(EMPTY_FILTER), false);
-  assert.equal(isFilterActive({ query: '  ', category: 'All' }), false);
-  assert.equal(isFilterActive({ query: 'tu', category: 'All' }), true);
-  assert.equal(isFilterActive({ query: '', category: 'Cafe' }), true);
+describe('isFilterActive', () => {
+  it('is false only for an empty query and "All"', () => {
+    expect(isFilterActive(EMPTY_FILTER)).toBe(false);
+    expect(isFilterActive({ query: '  ', category: 'All' })).toBe(false);
+    expect(isFilterActive({ query: 'tu', category: 'All' })).toBe(true);
+    expect(isFilterActive({ query: '', category: 'Cafe' })).toBe(true);
+  });
 });
