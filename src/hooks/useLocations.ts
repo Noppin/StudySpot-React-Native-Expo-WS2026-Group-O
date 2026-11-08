@@ -70,7 +70,9 @@ export function useLocations() {
     isRefreshing: liveQuery.isFetching,
     error: liveQuery.error ? getErrorMessage(liveQuery.error) : null,
     errorKind,
-    refresh: liveQuery.refetch,
+    refresh: useCallback(() => {
+      void liveQuery.refetch();
+    }, [liveQuery.refetch]),
   };
 }
 
