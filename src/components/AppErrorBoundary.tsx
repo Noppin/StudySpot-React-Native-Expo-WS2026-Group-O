@@ -39,7 +39,7 @@ export class AppErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <View style={styles.container} accessibilityRole="alert">
-          <Text style={styles.eyebrow}>STUDYSPOT</Text>
+          <Text style={styles.eyebrow}>StudySpot</Text>
           <Text style={styles.title}>Something went wrong</Text>
           <Text style={styles.message}>
             The current screen could not be displayed. You can try loading it again.
@@ -63,39 +63,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: theme.spacing.xl,
     backgroundColor: theme.colors.background,
   },
-  eyebrow: {
-    color: theme.colors.primary,
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-  },
-  title: {
-    color: theme.colors.text,
-    fontSize: 25,
-    fontWeight: '800',
-    marginTop: 8,
-  },
-  message: {
-    color: theme.colors.muted,
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 8,
-  },
+  eyebrow: { ...theme.type.label, color: theme.colors.subtle },
+  title: { ...theme.type.title, color: theme.colors.text, marginTop: theme.spacing.sm },
+  message: { ...theme.type.body, color: theme.colors.muted, marginTop: theme.spacing.sm },
   button: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.control,
-    marginTop: 20,
-    padding: 14,
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.text,
+    borderRadius: theme.radius.pill,
+    marginTop: theme.spacing.xl,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.75,
-  },
+  buttonText: { ...theme.type.label, color: theme.colors.background },
+  pressed: { opacity: 0.6 },
 });

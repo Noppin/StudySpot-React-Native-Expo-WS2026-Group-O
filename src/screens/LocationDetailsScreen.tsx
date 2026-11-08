@@ -67,14 +67,14 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 36 },
-  category: { color: theme.colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  category: { color: theme.colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   title: { color: theme.colors.text, fontSize: 29, fontWeight: '800', marginTop: 7 },
   intro: { color: theme.colors.muted, fontSize: 13, lineHeight: 19, marginTop: 7 },
   card: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
     borderWidth: 1,
-    borderRadius: theme.radius.card,
+    borderRadius: theme.radius.md,
     paddingHorizontal: 16,
     marginTop: 22,
   },
@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
   label: { color: theme.colors.muted, fontSize: 11, fontWeight: '700', marginBottom: 5 },
   value: { color: theme.colors.text, fontSize: 14, lineHeight: 20 },
   websiteButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.control,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.radius.md,
     padding: 14,
     alignItems: 'center',
     marginTop: 16,

@@ -63,14 +63,14 @@ export function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  eyebrow: { color: theme.colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  eyebrow: { color: theme.colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   title: { color: theme.colors.text, fontSize: 27, fontWeight: '800', marginTop: 5 },
   subtitle: { color: theme.colors.muted, fontSize: 13, lineHeight: 19, marginTop: 6 },
   card: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
     borderWidth: 1,
-    borderRadius: theme.radius.card,
+    borderRadius: theme.radius.md,
     padding: 16,
     marginTop: 22,
   },
@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
   value: { color: theme.colors.text, fontSize: 16, fontWeight: '700', marginTop: 7 },
   meta: { color: theme.colors.muted, fontSize: 12, marginTop: 5 },
   primaryButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.control,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.radius.md,
     padding: 14,
     alignItems: 'center',
     marginTop: 14,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   secondaryButton: {
     borderColor: theme.colors.border,
     borderWidth: 1,
-    borderRadius: theme.radius.control,
+    borderRadius: theme.radius.md,
     padding: 14,
     alignItems: 'center',
     marginTop: 10,

@@ -18,32 +18,37 @@ export function LocationCard({
   onToggleFavorite,
 }: LocationCardProps) {
   const distance = formatDistance(location.distanceMeters);
+  const meta = [location.category, distance].filter(Boolean).join(' · ');
 
   return (
-    <View style={styles.card}>
+    <View style={styles.row}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`Open ${location.name} details`}
         onPress={() => onPress(location)}
         style={({ pressed }) => [styles.main, pressed && styles.pressed]}
       >
-        <View style={styles.content}>
-          <Text style={styles.name}>{location.name}</Text>
-          <Text style={styles.category}>{location.category}</Text>
-          {location.address ? <Text style={styles.address}>{location.address}</Text> : null}
-          {distance ? <Text style={styles.distance}>{distance} away</Text> : null}
-        </View>
-        <Text style={styles.chevron}>›</Text>
+        <Text style={styles.name} numberOfLines={1}>
+          {location.name}
+        </Text>
+        <Text style={styles.meta}>{meta}</Text>
+        {location.address ? (
+          <Text style={styles.address} numberOfLines={1}>
+            {location.address}
+          </Text>
+        ) : null}
       </Pressable>
 
       {onToggleFavorite ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={isFavorite ? `Remove ${location.name} from saved places` : `Save ${location.name}`}
+          accessibilityLabel={
+            isFavorite ? `Remove ${location.name} from favorites` : `Add ${location.name} to favorites`
+          }
           accessibilityState={{ selected: isFavorite }}
           onPress={() => onToggleFavorite(location)}
-          hitSlop={8}
-          style={styles.favoriteButton}
+          hitSlop={10}
+          style={styles.favorite}
         >
           <Text style={[styles.favoriteIcon, isFavorite && styles.favoriteActive]}>
             {isFavorite ? '♥' : '♡'}
@@ -55,35 +60,19 @@ export function LocationCard({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.card,
-    borderWidth: 1,
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 4,
+    paddingVertical: 14,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
   },
-  main: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 12,
-  },
-  pressed: { opacity: 0.72 },
-  content: { flex: 1, paddingRight: 8 },
-  name: { color: theme.colors.text, fontSize: 16, fontWeight: '700' },
-  category: { color: theme.colors.primary, fontSize: 13, marginTop: 4, fontWeight: '600' },
-  address: { color: theme.colors.muted, fontSize: 12, marginTop: 5 },
-  distance: { color: theme.colors.muted, fontSize: 12, marginTop: 5, fontWeight: '600' },
-  chevron: { color: theme.colors.muted, fontSize: 25 },
-  favoriteButton: {
-    width: 42,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  favoriteIcon: { color: theme.colors.muted, fontSize: 25 },
-  favoriteActive: { color: '#C44747' },
+  main: { flex: 1, paddingRight: theme.spacing.md },
+  pressed: { opacity: 0.55 },
+  name: { ...theme.type.heading, color: theme.colors.text },
+  meta: { ...theme.type.caption, color: theme.colors.accent, marginTop: 2 },
+  address: { ...theme.type.caption, color: theme.colors.muted, marginTop: 2 },
+  favorite: { width: 36, alignItems: 'flex-end' },
+  favoriteIcon: { fontSize: 20, color: theme.colors.subtle },
+  favoriteActive: { color: theme.colors.text },
 });

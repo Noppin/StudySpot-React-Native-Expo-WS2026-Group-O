@@ -49,13 +49,13 @@ export function FavoritesScreen({ onSelectLocation }: FavoritesScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  eyebrow: { color: theme.colors.primary, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
+  eyebrow: { color: theme.colors.accent, fontSize: 10, fontWeight: '800', letterSpacing: 1.2 },
   title: { color: theme.colors.text, fontSize: 27, fontWeight: '800', marginTop: 5 },
   subtitle: { color: theme.colors.muted, fontSize: 13, lineHeight: 19, marginTop: 6 },
   list: { paddingTop: 18, paddingBottom: 24, flexGrow: 1 },
   separator: { height: 10 },
   empty: { alignItems: 'center', paddingHorizontal: 22, paddingVertical: 48 },
-  emptyIcon: { color: theme.colors.primary, fontSize: 42 },
+  emptyIcon: { color: theme.colors.accent, fontSize: 42 },
   emptyTitle: { color: theme.colors.text, fontSize: 17, fontWeight: '700', marginTop: 12 },
   emptyText: { color: theme.colors.muted, textAlign: 'center', lineHeight: 19, marginTop: 6 },
 });

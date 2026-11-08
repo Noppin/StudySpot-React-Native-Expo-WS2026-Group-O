@@ -2,21 +2,28 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { theme } from '../constants/theme';
 
+export type BannerTone = 'info' | 'warning' | 'error';
+
 interface InfoBannerProps {
   message: string;
-  tone?: 'info' | 'error' | 'success';
+  tone?: BannerTone;
 }
 
+const toneColors: Record<BannerTone, { background: string; dot: string }> = {
+  info: { background: theme.colors.surface, dot: theme.colors.accent },
+  warning: { background: theme.colors.warningSoft, dot: theme.colors.warning },
+  error: { background: theme.colors.dangerSoft, dot: theme.colors.danger },
+};
+
 export function InfoBanner({ message, tone = 'info' }: InfoBannerProps) {
-  const toneStyle =
-    tone === 'error'
-      ? styles.error
-      : tone === 'success'
-        ? styles.success
-        : styles.info;
+  const colors = toneColors[tone];
 
   return (
-    <View accessibilityRole="alert" style={[styles.container, toneStyle]}>
+    <View
+      accessibilityRole={tone === 'info' ? 'text' : 'alert'}
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <View style={[styles.dot, { backgroundColor: colors.dot }]} />
       <Text style={styles.message}>{message}</Text>
     </View>
   );
@@ -24,16 +31,14 @@ export function InfoBanner({ message, tone = 'info' }: InfoBannerProps) {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: theme.radius.control,
-    padding: 12,
-    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    borderRadius: theme.radius.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 10,
+    marginBottom: theme.spacing.md,
   },
-  info: { backgroundColor: theme.colors.primarySoft },
-  error: { backgroundColor: theme.colors.dangerSoft },
-  success: { backgroundColor: '#E8F4EC' },
-  message: {
-    color: theme.colors.text,
-    fontSize: 13,
-    lineHeight: 18,
-  },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  message: { ...theme.type.caption, color: theme.colors.text, flex: 1 },
 });

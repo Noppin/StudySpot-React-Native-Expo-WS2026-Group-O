@@ -70,7 +70,7 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
         <View style={styles.sourceRow}>
           <View style={[styles.sourceDot, dataSource === 'live' && styles.liveDot]} />
           <Text style={styles.sourceText}>{sourceLabel}</Text>
-          {isLoading ? <ActivityIndicator size="small" color={theme.colors.primary} /> : null}
+          {isLoading ? <ActivityIndicator size="small" color={theme.colors.accent} /> : null}
         </View>
       </View>
 
@@ -83,7 +83,7 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
           <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} />
         }
         ListHeaderComponent={
-          error ? <InfoBanner message={`${error} ${sourceLabel}.`} tone="error" /> : null
+          error ? <InfoBanner message={`${error} ${sourceLabel}.`} tone="error" /> : undefined
         }
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.border,
   },
   eyebrow: {
-    color: theme.colors.primary,
+    color: theme.colors.accent,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.3,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     borderColor: theme.colors.border,
     borderWidth: 1,
-    borderRadius: theme.radius.control,
+    borderRadius: theme.radius.md,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginTop: 18,

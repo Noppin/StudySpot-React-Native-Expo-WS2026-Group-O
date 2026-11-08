@@ -79,7 +79,7 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
             onToggleFavorite={toggleFavorite}
           />
         )}
-        ListEmptyComponent={<ActivityIndicator color={theme.colors.primary} />}
+        ListEmptyComponent={<ActivityIndicator color={theme.colors.accent} />}
       />
     </ScreenContainer>
   );
@@ -87,7 +87,7 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
 
 const styles = StyleSheet.create({
   eyebrow: {
-    color: theme.colors.primary,
+    color: theme.colors.accent,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1.2,
@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   locationButton: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: theme.radius.control,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.radius.md,
     padding: 14,
     alignItems: 'center',
     marginTop: 16,
