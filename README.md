@@ -1,76 +1,98 @@
-# Cross-Platform Project Starter (React Native + Expo + TypeScript)
+# StudySpot
 
-Welcome to the team project repository for the Cross-Platform Development course.
+StudySpot is a React Native application that helps students find libraries, cafés, universities and coworking spaces around the FHTW campus.
 
-## Team Details
-* **Student 1**: Nippon Lama (Noppin)
-* **Student 2**: Mark Stessl (Mark-Stessl)
-* **App Name**: StudySpot
+## Team
 
----
+- Mark Stessl
+- Nippon Lama (Noppin)
 
-## Environment Setup Requirements
+## Requirements
 
-Before running the application, ensure your mobile development tools are configured.
+- Node.js **22.13 or newer** (Node 22 LTS recommended for Expo SDK 58).
+- npm.
+- Android Studio with an Android emulator, or an Android device with a compatible Expo Go / development build.
+- Git.
 
-### 1. Android Emulator (Windows / Mac / Linux)
-1. Install **Android Studio**.
-2. Open Android Studio $\rightarrow$ **Virtual Device Manager** (AVD) and create a virtual device (e.g., Pixel 6 with API 34).
-3. Ensure your `ANDROID_HOME` environment variable is set:
-   * **Windows**: Set `ANDROID_HOME` to `C:\Users\<Your-Username>\AppData\Local\Android\Sdk` and add `%ANDROID_HOME%\platform-tools` and `%ANDROID_HOME%\emulator` to your `PATH`.
-   * **Mac**: Add `export ANDROID_HOME=$HOME/Library/Android/sdk` and `export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools` to your `~/.zshrc`.
+Check your Node version:
 
-#### Managing Emulators via Terminal:
-* **List installed emulators**:
-  ```bash
-  emulator -list-avds
-  ```
-* **Start an emulator from command line**:
-  ```bash
-  emulator -avd <YOUR_AVD_NAME>
-  ```
-  *(Example: `emulator -avd Pixel_6_API_34`)*
+```bash
+node --version
+```
 
----
+## Install and run
 
-### 2. iOS Simulator (Mac Only)
-1. Install **Xcode** from the Mac App Store.
-2. Open Xcode once to accept the license agreement and install required component tools.
-3. Open Simulator via Xcode $\rightarrow$ Open Developer Tool $\rightarrow$ Simulator.
+```bash
+npm install
+npx expo install --fix
+npm run typecheck
+npm test
+npx expo start
+```
 
----
+Press `a` in the Expo terminal to open the Android emulator. For a physical Android device, scan the QR code with the compatible Expo Go app. If the current Expo Go client does not yet support your SDK, use an Expo development build.
 
-## How to Run the App
+## Main features
 
-1. Install local dependencies:
-   ```bash
-   npm install
-   ```
+- **Explore:** browse and search nearby study places by name, category or address.
+- **Nearby:** request foreground GPS permission and sort places by distance.
+- **Saved:** keep a persistent offline shortlist.
+- **Settings:** refresh the OpenStreetMap data and clear only the downloaded location cache.
+- **Details:** inspect address, opening hours, coordinates and website when provided.
 
-2. Launch on target platform:
+## Data and offline behaviour
 
-   * **Android Emulator**:
-     * Start your AVD (via Android Studio or `emulator -avd <NAME>`), then run:
-     ```bash
-     npm run android
-     ```
+StudySpot queries the public OpenStreetMap Overpass API for named libraries, cafés, universities, colleges and coworking spaces around the FHTW campus. Results are mapped into the `StudyLocation` domain model.
 
-   * **iOS Simulator** (Mac only):
-     ```bash
-     npm run ios
-     ```
+The app stores the latest successful place list and saved favourites in AsyncStorage:
 
-   * **Physical Device (Expo Go Fallback)**:
-     * Scan the QR code using the **Expo Go** app:
-     ```bash
-     npm start
-     ```
+1. Previously cached places and favourites are loaded at startup.
+2. A network refresh is attempted.
+3. Successful results replace the location cache.
+4. If the API is unavailable, the app keeps cached places.
+5. If no cache exists, built-in sample places are shown.
+6. Favourites remain available offline and are not removed when the location cache is cleared.
 
----
+GPS is requested only after the user taps **Use my location**. StudySpot uses foreground permission only and does not track users in the background. If permission is denied, distances are calculated from the FHTW campus reference point.
 
-## Troubleshooting
+## Architecture
 
-* **Error: `adb command not found` / `Android SDK path not found`**
-  * **Fix**: Ensure `ANDROID_HOME` and the `platform-tools` + `emulator` folders are correctly added to your system `PATH` environment variable.
-* **Port 8081 is in use**
-  * **Fix**: Type `y` when prompted to switch to port 8082, or kill existing Node processes.
+```text
+App.tsx
+└── StudySpotProvider
+    └── NavigationContainer
+        └── AppNavigator
+            ├── Explore
+            ├── Nearby
+            ├── Saved
+            ├── Settings
+            └── Place Details
+
+src/
+├── components/     Reusable UI components
+├── constants/      Campus coordinates, storage keys and theme
+├── hooks/          Context hook
+├── navigation/     Typed stack and tab navigation
+├── screens/        Explore, Nearby, Saved, Settings and Details
+├── services/       Overpass API, GPS, AsyncStorage and sample data
+├── store/          Shared StudySpot context and state
+├── types/          Domain models
+└── utils/          Distance calculations and unit tests
+```
+
+## Testing
+
+```bash
+npm run typecheck
+npm test
+```
+
+The unit tests cover Haversine distance calculation, distance formatting, sorting, OpenStreetMap element mapping, response validation and duplicate removal.
+
+## OpenStreetMap attribution
+
+Place data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), available under the Open Database License (ODbL). Data availability and opening hours depend on community-maintained map tags and may be incomplete or outdated.
+
+## Project documentation
+
+See [`PROJECT_SPECIFICATION.md`](./PROJECT_SPECIFICATION.md) for the project concept, user stories, acceptance criteria, architecture, offline strategy, changelog and implementation traceability.
