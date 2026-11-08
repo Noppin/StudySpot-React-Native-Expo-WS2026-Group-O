@@ -27,6 +27,7 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
     currentLocation,
     locationError,
     requestCurrentLocation,
+    refresh,
     isFavorite,
     toggleFavorite,
   } = useStudySpot();
@@ -35,6 +36,13 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
     () => sortLocationsByDistance(locations, currentLocation ?? FHTW_CAMPUS_LOCATION),
     [locations, currentLocation],
   );
+
+  async function locateAndRefresh() {
+    const coordinates = await requestCurrentLocation();
+    if (coordinates) {
+      await refresh(coordinates);
+    }
+  }
 
   return (
     <ScreenContainer>
@@ -48,7 +56,7 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
 
       <Pressable
         accessibilityRole="button"
-        onPress={() => void requestCurrentLocation()}
+        onPress={() => void locateAndRefresh()}
         style={({ pressed }) => [styles.locationButton, pressed && styles.pressed]}
       >
         <Text style={styles.locationButtonText}>

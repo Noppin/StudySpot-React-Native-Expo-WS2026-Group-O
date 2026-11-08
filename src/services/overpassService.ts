@@ -1,5 +1,5 @@
 import { OVERPASS_API_URL, FHTW_CAMPUS_LOCATION, STUDY_LOCATION_RADIUS_METERS } from '../constants/studySpot';
-import type { StudyLocation, StudyLocationCategory } from '../types/StudyLocation';
+import type { Coordinates, StudyLocation, StudyLocationCategory } from '../types/StudyLocation';
 
 export interface OverpassElement {
   type: 'node' | 'way' | 'relation';
@@ -70,8 +70,8 @@ export function parseOverpassResponse(payload: unknown): StudyLocation[] {
   return Array.from(new Map(mapped.map((location) => [location.id, location])).values());
 }
 
-export function createOverpassQuery(): string {
-  const { latitude, longitude } = FHTW_CAMPUS_LOCATION;
+export function createOverpassQuery(origin: Coordinates = FHTW_CAMPUS_LOCATION): string {
+  const { latitude, longitude } = origin;
   const radius = STUDY_LOCATION_RADIUS_METERS;
   const amenityFilter = '["amenity"~"^(library|cafe|university|college)$"]';
   const coworkingFilter = '["office"="coworking"]';
@@ -90,7 +90,7 @@ export function createOverpassQuery(): string {
   ].join('\n');
 }
 
-export async function fetchStudyLocations(): Promise<StudyLocation[]> {
+export async function fetchStudyLocations(origin: Coordinates = FHTW_CAMPUS_LOCATION): Promise<StudyLocation[]> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
 
@@ -98,12 +98,12 @@ export async function fetchStudyLocations(): Promise<StudyLocation[]> {
     const response = await fetch(OVERPASS_API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-      body: `data=${encodeURIComponent(createOverpassQuery())}`,
+      body: `data=${encodeURIComponent(createOverpassQuery(origin))}`,
       signal: controller.signal,
     });
 
     if (!response.ok) {
-      throw new Error(`OpenStreetMap request failed (${response.status}).`);
+      throw new Error('Could not load study places. Please try again.');
     }
 
     return parseOverpassResponse(await response.json());

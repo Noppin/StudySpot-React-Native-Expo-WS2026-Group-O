@@ -30,10 +30,10 @@ interface StudySpotContextValue {
   lastUpdated: Date | null;
   currentLocation: Coordinates | null;
   locationError: string | null;
-  refresh: () => Promise<void>;
+  refresh: (origin?: Coordinates) => Promise<void>;
   toggleFavorite: (location: StudyLocation) => void;
   isFavorite: (locationId: string) => boolean;
-  requestCurrentLocation: () => Promise<void>;
+  requestCurrentLocation: () => Promise<Coordinates | null>;
   clearCache: () => Promise<void>;
 }
 
@@ -49,12 +49,12 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
   const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (origin?: Coordinates) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const freshLocations = await fetchStudyLocations();
+      const freshLocations = await fetchStudyLocations(origin);
       if (freshLocations.length === 0) {
         throw new Error('No named study places were returned by OpenStreetMap.');
       }
@@ -63,12 +63,11 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
       setLocations(freshLocations);
       setDataSource('live');
       setLastUpdated(new Date());
-    } catch (cause) {
-      const message =
-        cause instanceof Error ? cause.message : 'Could not refresh study places.';
+    } catch {
+      // Keep technical network details, including HTTP status codes, out of the UI.
       const cached = await loadCachedLocations();
 
-      setError(message);
+      setError('Could not refresh study places. Showing available saved or sample places.');
       if (cached.length > 0) {
         setLocations(cached);
         setDataSource('cache');
@@ -125,14 +124,17 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
     [favorites],
   );
 
-  const requestCurrentLocation = useCallback(async () => {
+  const requestCurrentLocation = useCallback(async (): Promise<Coordinates | null> => {
     setLocationError(null);
     try {
-      setCurrentLocation(await requestDeviceCoordinates());
-    } catch (cause) {
+      const coordinates = await requestDeviceCoordinates();
+      setCurrentLocation(coordinates);
+      return coordinates;
+    } catch {
       setLocationError(
-        cause instanceof Error ? cause.message : 'Could not read device location.',
+        'Could not access your location. Check the permission and try again.',
       );
+      return null;
     }
   }, []);
 
