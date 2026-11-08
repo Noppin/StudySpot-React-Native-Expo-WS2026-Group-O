@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { distanceInMeters, formatDistance, sortLocationsByDistance } from './distance';
-import type { StudyLocation } from '../types/StudyLocation';
+import type { StudyLocation } from '../types/Location';
 
 test('distanceInMeters returns zero for identical coordinates', () => {
   const point = { latitude: 48.2, longitude: 16.3 };

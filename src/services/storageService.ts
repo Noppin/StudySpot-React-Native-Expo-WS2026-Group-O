@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { STORAGE_KEYS } from '../constants/studySpot';
-import type { StudyLocation } from '../types/StudyLocation';
+import { STORAGE_KEYS } from '../constants/storageKeys';
+import type { StudyLocation } from '../types/Location';
 
 async function readArray<T>(key: string): Promise<T[]> {
   try {
@@ -20,16 +20,10 @@ async function writeArray<T>(key: string, value: T[]): Promise<void> {
 }
 
 export const loadCachedLocations = (): Promise<StudyLocation[]> =>
-  readArray<StudyLocation>(STORAGE_KEYS.locations);
+  readArray<StudyLocation>(STORAGE_KEYS.locationCache);
 
 export const saveCachedLocations = (locations: StudyLocation[]): Promise<void> =>
-  writeArray(STORAGE_KEYS.locations, locations);
-
-export const loadFavoriteLocations = (): Promise<StudyLocation[]> =>
-  readArray<StudyLocation>(STORAGE_KEYS.favorites);
-
-export const saveFavoriteLocations = (locations: StudyLocation[]): Promise<void> =>
-  writeArray(STORAGE_KEYS.favorites, locations);
+  writeArray(STORAGE_KEYS.locationCache, locations);
 
 export const clearCachedLocations = (): Promise<void> =>
-  AsyncStorage.removeItem(STORAGE_KEYS.locations);
+  AsyncStorage.removeItem(STORAGE_KEYS.locationCache);

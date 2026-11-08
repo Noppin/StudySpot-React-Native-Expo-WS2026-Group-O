@@ -1,6 +1,6 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 
-import type { StudyLocation } from '../types/StudyLocation';
+import type { StudyLocation } from '../types/Location';
 
 export type MainTabParamList = {
   Explore: undefined;

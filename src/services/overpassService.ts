@@ -1,5 +1,5 @@
-import { OVERPASS_API_URL, FHTW_CAMPUS_LOCATION, STUDY_LOCATION_RADIUS_METERS } from '../constants/studySpot';
-import type { Coordinates, StudyLocation, StudyLocationCategory } from '../types/StudyLocation';
+import { DEFAULT_LOCATION, DEFAULT_SETTINGS, OVERPASS_API_URL } from '../constants/studySpot';
+import type { Coordinates, StudyLocation, StudyLocationCategory } from '../types/Location';
 
 export interface OverpassElement {
   type: 'node' | 'way' | 'relation';
@@ -70,9 +70,11 @@ export function parseOverpassResponse(payload: unknown): StudyLocation[] {
   return Array.from(new Map(mapped.map((location) => [location.id, location])).values());
 }
 
-export function createOverpassQuery(origin: Coordinates = FHTW_CAMPUS_LOCATION): string {
+export function createOverpassQuery(
+  origin: Coordinates = DEFAULT_LOCATION,
+  radius: number = DEFAULT_SETTINGS.searchRadiusMeters,
+): string {
   const { latitude, longitude } = origin;
-  const radius = STUDY_LOCATION_RADIUS_METERS;
   const amenityFilter = '["amenity"~"^(library|cafe|university|college)$"]';
   const coworkingFilter = '["office"="coworking"]';
 
@@ -90,7 +92,7 @@ export function createOverpassQuery(origin: Coordinates = FHTW_CAMPUS_LOCATION):
   ].join('\n');
 }
 
-export async function fetchStudyLocations(origin: Coordinates = FHTW_CAMPUS_LOCATION): Promise<StudyLocation[]> {
+export async function fetchStudyLocations(origin: Coordinates = DEFAULT_LOCATION): Promise<StudyLocation[]> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30_000);
 

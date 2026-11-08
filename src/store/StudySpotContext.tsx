@@ -13,17 +13,14 @@ import { requestDeviceCoordinates } from '../services/deviceLocationService';
 import {
   clearCachedLocations,
   loadCachedLocations,
-  loadFavoriteLocations,
   saveCachedLocations,
-  saveFavoriteLocations,
 } from '../services/storageService';
-import type { Coordinates, StudyLocation } from '../types/StudyLocation';
+import type { Coordinates, StudyLocation } from '../types/Location';
 
 export type DataSource = 'live' | 'cache' | 'sample';
 
 interface StudySpotContextValue {
   locations: StudyLocation[];
-  favorites: StudyLocation[];
   isLoading: boolean;
   error: string | null;
   dataSource: DataSource;
@@ -31,8 +28,6 @@ interface StudySpotContextValue {
   currentLocation: Coordinates | null;
   locationError: string | null;
   refresh: (origin?: Coordinates) => Promise<void>;
-  toggleFavorite: (location: StudyLocation) => void;
-  isFavorite: (locationId: string) => boolean;
   requestCurrentLocation: () => Promise<Coordinates | null>;
   clearCache: () => Promise<void>;
 }
@@ -41,7 +36,6 @@ const StudySpotContext = createContext<StudySpotContextValue | undefined>(undefi
 
 export function StudySpotProvider({ children }: PropsWithChildren) {
   const [locations, setLocations] = useState<StudyLocation[]>(getMockStudyLocations());
-  const [favorites, setFavorites] = useState<StudyLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dataSource, setDataSource] = useState<DataSource>('sample');
@@ -84,14 +78,10 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
     let active = true;
 
     async function initialize() {
-      const [cached, savedFavorites] = await Promise.all([
-        loadCachedLocations(),
-        loadFavoriteLocations(),
-      ]);
+      const cached = await loadCachedLocations();
 
       if (!active) return;
 
-      setFavorites(savedFavorites);
       if (cached.length > 0) {
         setLocations(cached);
         setDataSource('cache');
@@ -106,23 +96,6 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
       active = false;
     };
   }, [refresh]);
-
-  const toggleFavorite = useCallback((location: StudyLocation) => {
-    setFavorites((current) => {
-      const exists = current.some((item) => item.id === location.id);
-      const next = exists
-        ? current.filter((item) => item.id !== location.id)
-        : [...current, location];
-
-      void saveFavoriteLocations(next);
-      return next;
-    });
-  }, []);
-
-  const isFavorite = useCallback(
-    (locationId: string) => favorites.some((item) => item.id === locationId),
-    [favorites],
-  );
 
   const requestCurrentLocation = useCallback(async (): Promise<Coordinates | null> => {
     setLocationError(null);
@@ -148,7 +121,6 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
   const value = useMemo(
     () => ({
       locations,
-      favorites,
       isLoading,
       error,
       dataSource,
@@ -156,14 +128,11 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
       currentLocation,
       locationError,
       refresh,
-      toggleFavorite,
-      isFavorite,
       requestCurrentLocation,
       clearCache,
     }),
     [
       locations,
-      favorites,
       isLoading,
       error,
       dataSource,
@@ -171,8 +140,6 @@ export function StudySpotProvider({ children }: PropsWithChildren) {
       currentLocation,
       locationError,
       refresh,
-      toggleFavorite,
-      isFavorite,
       requestCurrentLocation,
       clearCache,
     ],

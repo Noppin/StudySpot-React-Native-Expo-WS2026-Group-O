@@ -14,7 +14,7 @@ import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
 import { useStudySpot } from '../hooks/useStudySpot';
-import type { StudyLocation } from '../types/StudyLocation';
+import type { StudyLocation } from '../types/Location';
 
 interface HomeScreenProps {
   onSelectLocation: (location: StudyLocation) => void;
@@ -28,8 +28,6 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
     error,
     dataSource,
     refresh,
-    isFavorite,
-    toggleFavorite,
   } = useStudySpot();
 
   const filteredLocations = useMemo(() => {
@@ -95,8 +93,6 @@ export function HomeScreen({ onSelectLocation }: HomeScreenProps) {
           <LocationCard
             location={item}
             onPress={onSelectLocation}
-            isFavorite={isFavorite(item.id)}
-            onToggleFavorite={toggleFavorite}
           />
         )}
       />

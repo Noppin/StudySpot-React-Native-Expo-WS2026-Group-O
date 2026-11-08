@@ -1,4 +1,4 @@
-import type { Coordinates, StudyLocation } from '../types/StudyLocation';
+import type { Coordinates, StudyLocation } from '../types/Location';
 
 const EARTH_RADIUS_METERS = 6_371_000;
 

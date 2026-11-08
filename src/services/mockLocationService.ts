@@ -1,4 +1,4 @@
-import type { StudyLocation } from '../types/StudyLocation';
+import type { StudyLocation } from '../types/Location';
 
 const mockLocations: StudyLocation[] = [
   {

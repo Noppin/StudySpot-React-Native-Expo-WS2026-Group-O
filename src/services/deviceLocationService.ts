@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 
-import type { Coordinates } from '../types/StudyLocation';
+import type { Coordinates } from '../types/Location';
 
 export async function requestDeviceCoordinates(): Promise<Coordinates> {
   const permission = await Location.requestForegroundPermissionsAsync();

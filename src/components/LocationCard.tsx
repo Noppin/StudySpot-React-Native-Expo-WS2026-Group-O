@@ -1,22 +1,23 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { theme } from '../constants/theme';
-import type { StudyLocation } from '../types/StudyLocation';
+import { useFavoritesStore, useIsFavorite } from '../store/favoritesStore';
+import type { StudyLocation } from '../types/Location';
 import { formatDistance } from '../utils/distance';
 
 interface LocationCardProps {
   location: StudyLocation;
   onPress: (location: StudyLocation) => void;
-  isFavorite?: boolean;
-  onToggleFavorite?: (location: StudyLocation) => void;
+  showFavoriteToggle?: boolean;
 }
 
 export function LocationCard({
   location,
   onPress,
-  isFavorite = false,
-  onToggleFavorite,
+  showFavoriteToggle = true,
 }: LocationCardProps) {
+  const isFavorite = useIsFavorite(location.id);
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
   const distance = formatDistance(location.distanceMeters);
   const meta = [location.category, distance].filter(Boolean).join(' · ');
 
@@ -39,14 +40,14 @@ export function LocationCard({
         ) : null}
       </Pressable>
 
-      {onToggleFavorite ? (
+      {showFavoriteToggle ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={
             isFavorite ? `Remove ${location.name} from favorites` : `Add ${location.name} to favorites`
           }
           accessibilityState={{ selected: isFavorite }}
-          onPress={() => onToggleFavorite(location)}
+          onPress={() => toggleFavorite(location)}
           hitSlop={10}
           style={styles.favorite}
         >

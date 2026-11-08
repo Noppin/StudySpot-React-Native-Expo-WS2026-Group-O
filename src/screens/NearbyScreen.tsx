@@ -11,11 +11,11 @@ import {
 import { InfoBanner } from '../components/InfoBanner';
 import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { FHTW_CAMPUS_LOCATION } from '../constants/studySpot';
+import { DEFAULT_LOCATION } from '../constants/studySpot';
 import { theme } from '../constants/theme';
 import { useStudySpot } from '../hooks/useStudySpot';
 import { sortLocationsByDistance } from '../utils/distance';
-import type { StudyLocation } from '../types/StudyLocation';
+import type { StudyLocation } from '../types/Location';
 
 interface NearbyScreenProps {
   onSelectLocation: (location: StudyLocation) => void;
@@ -28,12 +28,10 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
     locationError,
     requestCurrentLocation,
     refresh,
-    isFavorite,
-    toggleFavorite,
   } = useStudySpot();
 
   const sortedLocations = useMemo(
-    () => sortLocationsByDistance(locations, currentLocation ?? FHTW_CAMPUS_LOCATION),
+    () => sortLocationsByDistance(locations, currentLocation ?? DEFAULT_LOCATION),
     [locations, currentLocation],
   );
 
@@ -75,8 +73,6 @@ export function NearbyScreen({ onSelectLocation }: NearbyScreenProps) {
           <LocationCard
             location={item}
             onPress={onSelectLocation}
-            isFavorite={isFavorite(item.id)}
-            onToggleFavorite={toggleFavorite}
           />
         )}
         ListEmptyComponent={<ActivityIndicator color={theme.colors.accent} />}

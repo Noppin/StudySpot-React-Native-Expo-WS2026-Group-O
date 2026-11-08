@@ -8,7 +8,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { LocationDetailsScreen } from '../screens/LocationDetailsScreen';
 import { NearbyScreen } from '../screens/NearbyScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
-import type { StudyLocation } from '../types/StudyLocation';
+import type { StudyLocation } from '../types/Location';
 import type { MainTabParamList, RootStackParamList } from './navigationTypes';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

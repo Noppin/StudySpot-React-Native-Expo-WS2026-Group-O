@@ -3,15 +3,15 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { LocationCard } from '../components/LocationCard';
 import { ScreenContainer } from '../components/ScreenContainer';
 import { theme } from '../constants/theme';
-import { useStudySpot } from '../hooks/useStudySpot';
-import type { StudyLocation } from '../types/StudyLocation';
+import { useFavoritesStore } from '../store/favoritesStore';
+import type { StudyLocation } from '../types/Location';
 
 interface FavoritesScreenProps {
   onSelectLocation: (location: StudyLocation) => void;
 }
 
 export function FavoritesScreen({ onSelectLocation }: FavoritesScreenProps) {
-  const { favorites, isFavorite, toggleFavorite } = useStudySpot();
+  const favorites = useFavoritesStore((state) => state.favorites);
 
   return (
     <ScreenContainer>
@@ -30,8 +30,6 @@ export function FavoritesScreen({ onSelectLocation }: FavoritesScreenProps) {
           <LocationCard
             location={item}
             onPress={onSelectLocation}
-            isFavorite={isFavorite(item.id)}
-            onToggleFavorite={toggleFavorite}
           />
         )}
         ListEmptyComponent={
